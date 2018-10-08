@@ -11,9 +11,12 @@ const index = async (message, data) => {
   } else if (message[0] === '/jadwal') {
     reply = await jadwal(message, data);
   } else if (message[0] === '/langganan') {
-    reply = await (langganan(message, data));
+    reply = await textMessage('Fitur berlangganan jadwal teater akan segera hadir. Ditunggu, ya!')
+    // reply = await (langganan(message, data));
   } else if (message[0] === '/daftar-performer' && message.length === 2) {
     reply = await daftarPerformer(message, data);
+  } else if (message[0] === '/beli') {
+    reply = await textMessage('Fitur pembelian tiket akan segera hadir. Ditunggu, ya!')
   }
 
   storeMessage(message, data);
