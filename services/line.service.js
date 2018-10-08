@@ -1,8 +1,10 @@
+require('dotenv').config();
 const messageModel = require('../models/message.model');
 const setlistModel = require('../models/setlist.model');
 const subscriberModel = require('../models/subscriber.model');
 const axios = require('axios');
 const moment = require('moment');
+
 const index = async (message, data) => {
   let reply = await textMessage('Perintah tidak ditemukan, silakan lihat daftar perintah dengan mengetikkan /help');
   
@@ -106,11 +108,9 @@ const jadwal = async (message, data) => {
           "slug": message
         });
 
-        shows = await axios.get('http://35.221.65.94:3000/shows/' + encodeURI(message));
+        shows = await axios.get(process.env.CRAWLER_ENDPOINT + 'shows/' + encodeURI(message));
 
         shows = shows.data;
-
-        console.log(shows);
 
         reply = {
           "type": "template",
@@ -121,7 +121,6 @@ const jadwal = async (message, data) => {
         };
 
         reply.template.columns = shows.map((show) => {
-          console.log(show.unixTime);
           return {
             "title": setlist.plain().name,
             "text": moment.unix(show.unixTime).format("dddd, DD MMMM YYYY") + ', ' + show.showTime + '\n' + setlist.plain().description,
@@ -153,8 +152,7 @@ const daftarPerformer = async (message, data) => {
 
   try {
     //setlist check
-    show = await axios.get('http://35.221.65.94:3000/shows/memberlist/' + encodeURI(message));
-    console.log(show);
+    show = await axios.get(process.env.CRAWLER_ENDPOINT + 'shows/memberlist/' + encodeURI(message));
     show = show.data;
 
     if (show.members.length != 0) {
