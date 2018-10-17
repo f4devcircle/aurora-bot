@@ -12,6 +12,10 @@ const subscriberSchema = new Schema({
     type: String, 
   },
 
+  roomId: { 
+    type: String, 
+  },
+
   setlistId: { 
     type: String, 
   },
