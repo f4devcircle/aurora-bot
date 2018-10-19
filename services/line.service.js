@@ -405,7 +405,7 @@ const checkMaxSubscribe = async(data) => {
 
   subscribes = await subscribes.run();
 
-  if (subscribes.entities.length < 3) {
+  if (subscribes.entities.length >= 3) {
     return false;
   }
 
