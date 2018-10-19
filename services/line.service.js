@@ -279,7 +279,7 @@ const daftarMember = async (message, data) => {
 
         reply.template.columns = batch.map((member) => {
           return {
-            "thumbnailImageUrl": (member.imgURL.split('?')[0]).replace(/_s./g, "."),
+            "thumbnailImageUrl": (member.imgURL.split('?')[0]).replace(/_s.jpg/g, ".jpg"),
             "title": member.name,
             "text": "Tim " + member.team,
             "actions": [
