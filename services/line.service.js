@@ -306,6 +306,10 @@ const daftarMember = async (message, data) => {
 const langganan = async (message, data) => {
   let reply = "Kata kunci tidak ditemukan";
 
+  if (!(await checkMaxSubscribe(data))) {
+    return await textMessage('Anda sudah melebihi batas maksimal berlangganan di kanal room/group/pribadi ini');
+  }
+
   if (message[1] === 'member') {
     message.splice(0, 2);
     message = message.join(" ");
@@ -391,6 +395,21 @@ const langganan = async (message, data) => {
   }
 
   return await textMessage(reply);
+};
+
+const checkMaxSubscribe = async(data) => {
+  let subscribes = await subscriberModel.query()
+    .filter('roomId', '=', data.roomId || null)
+    .filter('userId', '=', data.userId || null)
+    .filter('groupId', '=', data.groupId || null)
+
+  subscribes = await subscribes.run();
+
+  if (subscribes.entities.length < 3) {
+    return false;
+  }
+
+  return true;
 };
 
 const send = async (message, data, push = false) => {

@@ -4,7 +4,7 @@ const lineService = require('../services/line.service');
 const index = async (req, res, next) => {
   let request = req.body.events[0];
 
-  if (request.type === 'message' && request.message.type === 'text' && request.message.text.charAt(0) === '/' && request.message.text.split(" ").length < 6) {
+  if (request.type === 'message' && request.message.type === 'text' && request.message.text.charAt(0) === '/' && request.message.text.split(" ").length < 10) {
 
     request.message.text = request.message.text.split(" ");
     
