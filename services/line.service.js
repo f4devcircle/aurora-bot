@@ -34,6 +34,9 @@ const index = async (message, data) => {
   } else if (message[0] === '/daftar-member') {
     reply = await (daftarMember(message, data));
     return true;
+  } else if (message[0] === '/batal-langganan') {
+    reply = await unsubscribe(message, data);
+    return true;
   } else {
     send(reply, data);
   }
@@ -492,7 +495,6 @@ const push = async (req) => {
         .filter('memberId', '=', req.body.memberId)
   
       subscribers = await subscribers.run();
-      console.log(subscribers);
 
       subscribers.entities.forEach(function(subscriber) {
         reply = {
@@ -525,6 +527,76 @@ const push = async (req) => {
     }
   }
   
+  return true;
+};
+
+const unsubscribe = async (message, data) => {
+  if (message.length === 1) {
+    let subscribes = await subscriberModel.query()
+      .filter('roomId', '=', data.roomId || null)
+      .filter('userId', '=', data.userId || null)
+      .filter('groupId', '=', data.groupId || null)
+
+    subscribes = await subscribes.run();
+
+    reply = {
+      "type": "template",
+      "altText": "Daftar langganan",
+      "template": {
+        "type": "carousel",     
+        "imageAspectRatio": "square",
+        "imageSize": "cover",
+        "columns": []
+      }
+    };
+
+    if (subscribes.entities.length !== 0) {
+      const a = subscribes.entities.map(async (subscribe) => {
+        let temp;
+  
+        if (subscribe.setlistId) {
+          temp = await setlistModel.get(subscribe.setListId);
+        } else {
+          temp = await memberModel.get(subscribe.memberId);
+        }
+  
+        reply.template.columns.push(
+          {
+            "title": temp.name,
+            "text": 'Langganan ' + ((subscribe.setlistId)? 'setlist' : 'member'),
+            "actions": [
+              {
+                "type": "message",
+                "label": "Batalkan langganan",
+                "text": "/batal-langganan " + subscribe.id
+              },
+            ]
+          }
+        );
+      });
+  
+      await Promise.all(a);
+    } else {
+      reply = await textMessage('Anda belum berlangganan apapun');
+    }
+
+    send(reply, data);
+  } else {
+    let reply = "Kata kunci tidak ditemukan";
+
+    try {
+      const response = await subscriberModel.delete(Number(message[1]));
+      console.log(response);
+      if (response.success) {
+        send(await textMessage('Langganan telah dihapus'), data);
+      } else {
+        send(await textMessage(reply), data);
+      }  
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return true;
 }
 
