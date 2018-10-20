@@ -331,11 +331,19 @@ const langganan = async (message, data) => {
         memberId: member.plain().id
       });
 
-      let isSubscribed = await subscriberModel.query()
-        .filter('roomId', '=', data.roomId || null)
-        .filter('userId', '=', data.userId || null)
-        .filter('groupId', '=', data.groupId || null)
-        .filter('memberId', '=', member.plain().id)
+      if (data.roomId || data.groupId) {
+        isSubscribed = await subscriberModel.query()
+          .filter('roomId', '=', data.roomId || null)
+          .filter('groupId', '=', data.groupId || null)
+          .filter('memberId', '=', member.plain().id)
+      } else {
+        isSubscribed = await subscriberModel.query()
+          .filter('roomId', '=', data.roomId || null)
+          .filter('userId', '=', data.userId || null)
+          .filter('groupId', '=', data.groupId || null)
+          .filter('memberId', '=', member.plain().id)
+      }
+      
 
       isSubscribed = await isSubscribed.run();
 
@@ -372,11 +380,18 @@ const langganan = async (message, data) => {
         setlistId: setlist.plain().id
       });
 
-      let isSubscribed = await subscriberModel.query()
+      if (data.roomId || data.groupId) {
+        isSubscribed = await subscriberModel.query()
+        .filter('roomId', '=', data.roomId || null)
+        .filter('groupId', '=', data.groupId || null)
+        .filter('setlistId', '=', setlist.plain().id)
+      } else {
+        isSubscribed = await subscriberModel.query()
         .filter('roomId', '=', data.roomId || null)
         .filter('userId', '=', data.userId || null)
         .filter('groupId', '=', data.groupId || null)
         .filter('setlistId', '=', setlist.plain().id)
+      }
 
       isSubscribed = await isSubscribed.run();
 
