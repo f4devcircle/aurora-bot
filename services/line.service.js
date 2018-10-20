@@ -70,7 +70,9 @@ const storeMessage = async (message, data) => {
 const help = async () => {
   reply = 
 
-`Untuk memulai, ketik /jadwal`;
+`/jadwal - melihat jadwal show teater
+/daftar-member - melihat daftar member
+/batal-langganan - membatalkan langganan jadwal`;
 
   return await reply;
 };
