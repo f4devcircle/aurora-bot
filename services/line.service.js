@@ -134,27 +134,32 @@ const jadwal = async (message, data) => {
 
         shows = shows.data;
 
-        reply = {
-          "type": "template",
-          "altText": "Jadwal setlist " + setlist.plain().name,
-          "template": {
-            "type": "carousel",
-          }
-        };
-
-        reply.template.columns = shows.map((show) => {
-          return {
-            "title": setlist.plain().name,
-            "text": moment.unix(show.unixTime).format("dddd, DD MMMM YYYY") + ', ' + show.showTime + '\n' + setlist.plain().description,
-            "actions": [
-              {
-                "type": "message",
-                "label": "Daftar Member",
-                "text": "/daftar-performer " + show.unixTime
-              },
-            ]
-          }
-        });
+        if (shows.length !== 0) {
+          reply = {
+            "type": "template",
+            "altText": "Jadwal setlist " + setlist.plain().name,
+            "template": {
+              "type": "carousel",
+            }
+          };
+  
+          reply.template.columns = shows.map((show) => {
+            return {
+              "title": setlist.plain().name,
+              "text": moment.unix(show.unixTime).format("dddd, DD MMMM YYYY") + ', ' + show.showTime + '\n' + setlist.plain().description,
+              "actions": [
+                {
+                  "type": "message",
+                  "label": "Daftar Member",
+                  "text": "/daftar-performer " + show.unixTime
+                },
+              ]
+            }
+          });
+        } else {
+          reply = await textMessage('Belum ada jadwal tersedia untuk setlist ini');
+        }
+        
       } catch (error) {
         console.log(error);
       }
