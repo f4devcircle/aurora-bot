@@ -371,7 +371,7 @@ const langganan = async (message, data) => {
     
     } catch (error) {
       if (message === 'japri') {
-        reply = textMessage('Astaghfirullah, malah japri :(');
+        reply = 'Astaghfirullah, malah japri :(';
       }
       console.log(error);
     }
