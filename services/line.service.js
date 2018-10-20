@@ -547,11 +547,17 @@ const push = async (req) => {
 
 const unsubscribe = async (message, data) => {
   if (message.length === 1) {
-    let subscribes = await subscriberModel.query()
-      .filter('roomId', '=', data.roomId || null)
-      .filter('userId', '=', data.userId || null)
-      .filter('groupId', '=', data.groupId || null)
-
+    if (data.roomId || data.groupId) {
+      subscribes = await subscriberModel.query()
+        .filter('roomId', '=', data.roomId || null)
+        .filter('groupId', '=', data.groupId || null)
+    } else {
+      subscribes = await subscriberModel.query()
+        .filter('roomId', '=', data.roomId || null)
+        .filter('userId', '=', data.userId || null)
+        .filter('groupId', '=', data.groupId || null)
+    }
+    
     subscribes = await subscribes.run();
 
     reply = {
