@@ -417,11 +417,17 @@ const langganan = async (message, data) => {
   return await textMessage(reply);
 };
 
-const checkMaxSubscribe = async(data) => {
-  let subscribes = await subscriberModel.query()
-    .filter('roomId', '=', data.roomId || null)
-    .filter('userId', '=', data.userId || null)
-    .filter('groupId', '=', data.groupId || null)
+const checkMaxSubscribe = async (data) => {
+  if (data.roomId || data.groupId) {
+    subscribes = await subscriberModel.query()
+      .filter('roomId', '=', data.roomId || null)
+      .filter('groupId', '=', data.groupId || null)
+  } else {
+    subscribes = await subscriberModel.query()
+      .filter('roomId', '=', data.roomId || null)
+      .filter('userId', '=', data.userId || null)
+      .filter('groupId', '=', data.groupId || null)
+  }
 
   subscribes = await subscribes.run();
 
