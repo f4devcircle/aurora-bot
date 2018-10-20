@@ -555,14 +555,13 @@ const unsubscribe = async (message, data) => {
         let temp;
   
         if (subscribe.setlistId) {
-          temp = await setlistModel.get(subscribe.setListId);
+          temp = await setlistModel.get(subscribe.setlistId);
         } else {
           temp = await memberModel.get(subscribe.memberId);
         }
-  
         reply.template.columns.push(
           {
-            "title": temp.name,
+            "title": (subscribe.setlistId)? temp.plain().name : temp.name,
             "text": 'Langganan ' + ((subscribe.setlistId)? 'setlist' : 'member'),
             "actions": [
               {
@@ -574,7 +573,6 @@ const unsubscribe = async (message, data) => {
           }
         );
       });
-  
       await Promise.all(a);
     } else {
       reply = await textMessage('Anda belum berlangganan apapun');
