@@ -95,7 +95,7 @@ const jadwal = async (message, data) => {
       }
     };
 
-    setlist = await setlistModel.list();
+   let setlist = await setlistModel.list();
 
     reply.template.columns = setlist.entities.map((sl) => {
       return {
@@ -124,16 +124,16 @@ const jadwal = async (message, data) => {
     try {
       // setlist check
 
-      setlist = await setlistModel.findOne({
-        "slug": message
-      });
+      // let setlist = await setlistModel.findOne({
+      //   "slug": message
+      // });
     
       try {
-        setlist = await setlistModel.findOne({
+        let setlist = await setlistModel.findOne({
           "slug": message
         });
 
-        shows = await axios.get(process.env.CRAWLER_ENDPOINT + 'shows/' + encodeURI(message));
+        let shows = await axios.get(process.env.CRAWLER_ENDPOINT + 'shows/' + encodeURI(message));
 
         shows = shows.data;
 
@@ -182,7 +182,7 @@ const daftarPerformer = async (message, data) => {
 
   try {
     //setlist check
-    show = await axios.get(process.env.CRAWLER_ENDPOINT + 'shows/memberlist/' + encodeURI(message));
+    let show = await axios.get(process.env.CRAWLER_ENDPOINT + 'shows/memberlist/' + encodeURI(message));
     show = show.data;
 
     if (show.members.length != 0) {
@@ -260,7 +260,7 @@ const daftarMember = async (message, data) => {
         }
       };
   
-      send(reply, data);
+      return send(reply, data);
     } catch (error) {
       console.log(error);
       return send(reply, data);
@@ -269,14 +269,14 @@ const daftarMember = async (message, data) => {
   } else {
 
     try {
-      members = await memberModel.query()
+      let members = await memberModel.query()
         .filter('team', '=', message[message.length - 1])
 
       members = await members.run();
     
-      batches = _.chunk(members.entities, 10);
+      let batches = _.chunk(members.entities, 10);
 
-      replies = batches.map((batch) => {
+      let replies = batches.map((batch) => {
         reply = {
           "type": "template",
           "altText": "Daftar member tim " + message[message.length - 1],
@@ -330,7 +330,7 @@ const langganan = async (message, data) => {
     try {
       // setlist check
 
-      member = await memberModel.findOne({
+      let member = await memberModel.findOne({
         "name": message
       });
 
@@ -355,7 +355,7 @@ const langganan = async (message, data) => {
       }
       
 
-      isSubscribed = await isSubscribed.run();
+      let isSubscribed = await isSubscribed.run();
 
 
       if (isSubscribed.entities.length === 0) {
@@ -382,7 +382,7 @@ const langganan = async (message, data) => {
     try {
       // setlist check
 
-      setlist = await setlistModel.findOne({
+      let setlist = await setlistModel.findOne({
         "slug": message
       });
 
@@ -406,7 +406,7 @@ const langganan = async (message, data) => {
         .filter('setlistId', '=', setlist.plain().id)
       }
 
-      isSubscribed = await isSubscribed.run();
+      let isSubscribed = await isSubscribed.run();
 
 
       if (isSubscribed.entities.length === 0) {
@@ -429,6 +429,7 @@ const langganan = async (message, data) => {
 };
 
 const checkMaxSubscribe = async (data) => {
+  let subscribes;
   if (data.roomId || data.groupId) {
     subscribes = await subscriberModel.query()
       .filter('roomId', '=', data.roomId || null)
@@ -475,6 +476,7 @@ const send = async (message, data, push = false) => {
 
 const push = async (req) => {
   if (req.body.type === 'setlist') {
+    let setlist;
     try {
       setlist = await setlistModel.findOne({
         "slug": req.body.showData.showName
@@ -521,7 +523,7 @@ const push = async (req) => {
         "slug": req.body.showData.showName
       });
 
-      member = await memberModel.get(req.body.memberId);
+      let member = await memberModel.get(req.body.memberId);
 
       console.log(member);
 
@@ -565,6 +567,7 @@ const push = async (req) => {
 };
 
 const unsubscribe = async (message, data) => {
+  let subscribes;
   if (message.length === 1) {
     if (data.roomId || data.groupId) {
       subscribes = await subscriberModel.query()
