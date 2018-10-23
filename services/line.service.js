@@ -246,7 +246,7 @@ const daftarMember = async (message, data) => {
               ]
             },
             {
-              "thumbnailImageUrl": "https://vignette.wikia.nocookie.net/akb48/images/9/93/Screenshot_%28146%29.png",
+              "thumbnailImageUrl": "https://storage.googleapis.com/asia.artifacts.f4-dev-circle.appspot.com/bot-images/academy.png",
               "text": "JKT48 Academy",
               "actions": [
                 {
