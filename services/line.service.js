@@ -317,6 +317,7 @@ const daftarMember = async (message, data) => {
 };
 
 const langganan = async (message, data) => {
+  let isSubscribed
   let reply = "Kata kunci tidak ditemukan";
 
   if (!(await checkMaxSubscribe(data))) {
@@ -355,7 +356,7 @@ const langganan = async (message, data) => {
       }
       
 
-      let isSubscribed = await isSubscribed.run();
+       isSubscribed = await isSubscribed.run();
 
 
       if (isSubscribed.entities.length === 0) {
