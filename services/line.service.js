@@ -71,7 +71,7 @@ const storeMessage = async (message, data) => {
 };
 
 const help = async () => {
-  reply = 
+  let reply = 
 
 `/jadwal - melihat jadwal show teater
 /daftar-member - melihat daftar member
@@ -377,6 +377,7 @@ const langganan = async (message, data) => {
       console.log(error);
     }
   } else {
+    let isSubscribed
     message.splice(0, 1);
     message = message.join(" ");
 
@@ -407,7 +408,7 @@ const langganan = async (message, data) => {
         .filter('setlistId', '=', setlist.plain().id)
       }
 
-      let isSubscribed = await isSubscribed.run();
+      isSubscribed = await isSubscribed.run();
 
 
       if (isSubscribed.entities.length === 0) {
