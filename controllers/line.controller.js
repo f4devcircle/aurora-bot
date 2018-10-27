@@ -29,8 +29,7 @@ const index = async (req, res, next) => {
 
 const push = async (req, res, next) => {
   await lineService.push(req);
-
-  res.json("OK")
+  res.json("OK");
 }
 
 module.exports = {
