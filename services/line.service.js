@@ -521,7 +521,7 @@ const push = async (req) => {
     }
   } else {
     try {
-      setlist = await setlistModel.findOne({
+      let setlist = await setlistModel.findOne({
         "slug": req.body.showData.showName
       });
 
