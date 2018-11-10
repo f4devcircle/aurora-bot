@@ -8,7 +8,8 @@ const moment = require('moment');
  
 const datastore = new Datastore({
   projectId: 'f4-dev-circle',
-  keyFilename: __dirname + '/googlekey.json'
+  keyFilename: __dirname + '/googlekey.json',
+  namespace: process.env.DATASTORE_NAMESPACE
 });
  
 moment.locale("id-ID");

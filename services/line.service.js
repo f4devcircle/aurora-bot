@@ -37,9 +37,6 @@ const index = async (message, data) => {
   } else if (message[0] === '/batal-langganan') {
     reply = await unsubscribe(message, data);
     return true;
-  } else if (message[0] === '/batal-langganan') {
-    reply = await unsubscribe(message, data);
-    return true;
   } else {
     send(reply, data);
   }
