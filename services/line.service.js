@@ -29,13 +29,16 @@ const index = async (message, data) => {
     reply = await daftarPerformer(message, data);
     return send(reply, data);
   } else if (message[0] === '/beli') {
-    reply = await textMessage('Fitur pembelian tiket akan segera hadir. Ditunggu, ya!');
-    return send(reply, data);
+    // reply = await textMessage('Fitur pembelian tiket akan segera hadir. Ditunggu, ya!');
+    return await beli(message, data);
   } else if (message[0] === '/daftar-member') {
     reply = await (daftarMember(message, data));
     return true;
   } else if (message[0] === '/batal-langganan') {
     reply = await unsubscribe(message, data);
+    return true;
+  } else if (message[0] === '/login') {
+    reply = await login(message, data);
     return true;
   } else {
     send(reply, data);
@@ -43,6 +46,179 @@ const index = async (message, data) => {
 
   storeMessage(message, data);
   return true;
+};
+
+const login = async (message, data) => {
+  try {
+    const isLoggedIn = (await axios.get(process.env.CRAWLER_ENDPOINT + 'auth/login/' +data.userId)).data.isLoggedIn;
+    if (message[1] === 'logout') {
+      if (isLoggedIn) {
+          await axios.post(process.env.CRAWLER_ENDPOINT + 'auth/logout/' + data.userId);
+          return send(await textMessage('Anda telah berhasil keluar dari akun JKT48'), data);
+      } else {
+        return send(await textMessage('Anda belum login ke akun JKT48'), data);
+      }
+    } else if (isLoggedIn) {
+      return send(await textMessage('Anda sudah login ke akun JKT48 sebelumnya'), data);
+    } else {
+        if (data.groupId !== undefined || data.roomId !== undefined) {
+        reply = {
+          "type": "template",
+          "altText": "Silakan login ke akun JKT48 anda",
+          "template": {
+            "type": "carousel",     
+            "imageAspectRatio": "square",
+            "imageSize": "cover",   
+            "columns": [
+              {
+                "text": "Silakan login terlebih dahulu dengan mengetikan /login melalui japri di akun JKTbot",
+                "actions": [
+                  {
+                    "type": "uri",
+                    "label": "Japri JKTbot",
+                    "uri": "line://oaMessage/@jktbot/?%2Flogin"
+                  },
+                ]
+              }
+            ]
+          }
+        };
+      } else {
+        reply = {
+          "type": "template",
+          "altText": "Silakan login terlebih dahulu",
+          "template": {
+            "type": "carousel",     
+            "imageAspectRatio": "square",
+            "imageSize": "cover",   
+            "columns": [
+              {
+                "text": "Silakan login terlebih dahulu di akun JKT48 anda",
+                "actions": [
+                  {
+                    "type": "uri",
+                    "label": "Login",
+                    "uri": "https://ngidol.club?userId=" + data.userId
+                  },
+                ]
+              }
+            ]
+          }
+        };
+      }  
+      return send(reply, data);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  
+};
+
+const beli = async (message, data) => {
+  const isLoggedIn = (await axios.get(process.env.CRAWLER_ENDPOINT + 'auth/login/' +data.userId)).data.isLoggedIn;
+
+  if (isLoggedIn) {
+    let buying = (await axios.post(process.env.CRAWLER_ENDPOINT + 'buy/' + message[1], {
+      lineId: data.userId,
+      options: {
+        ticketClass: 'GEN',
+        ticketType: message[2],
+        paymentOption: 'jkt48 points',
+        confirm: (message[3] === 'confirm' && message[4] === data.userId)? true : false
+      }
+    }));
+
+    console.log(buying);
+    buying = buying.data;
+
+    if (buying.error.type === 'NOT_FOUND') {
+      return send(await textMessage('Jadwal yang ingin dibeli tidak tersedia'), data);
+    } else if (buying.error.type === 'NOT_AVAILABLE') {
+      return send(await textMessage('Tiket tidak tersedia untuk jadwal ini'), data);
+    } else if (buying.error.type === 'ALREADY_BOUGHT') {
+      return send(await textMessage('Anda sudah membeli tiket pertunjukan ini sebelumnya'), data);
+    } else if (buying.error.type === 'NEED_TICKET_TYPE' && (message[2] !== 'dewasa' || message[2] !== 'siswa')) {
+      reply = {
+        "type": "template",
+        "altText": "Silakan pilih jenis tiket yang akan dibeli",
+        "template": {
+          "type": "buttons",
+          "text": "Silakan pilih jenis tiket yang akan dibeli",
+          "actions": buying.error.options.map(type => {
+            return {
+              "type": "message",
+              "label": type.charAt(0).toUpperCase() + type.slice(1),
+              "text": "/beli " + message[1] + " " + type
+            }
+          })
+        }
+      };
+      console.log(reply.template.actions);
+      return send(reply, data);
+    } else if (buying.error.type === 'NOT_ENOUGH_BALANCE') {
+      return send(await textMessage('Saldo anda tidak cukup untuk membeli tiket ini'), data);
+    } else if (buying.error.type === 'NEED_CONFIRMATION') {
+      let messages = [];
+      messages.push(await textMessage('Apakah anda yakin akan membeli tiket "' + buying.error.purchaseDetails['Nama Acara'] + '" (' + buying.error.purchaseDetails['Show'] + ') seharga "' + buying.error.purchaseDetails['Total Pembayaran'] + '" (' + buying.error.purchaseDetails['Tipe Tiket'] + " - " + buying.error.purchaseDetails['Jenis Tiket'] + ') atas nama "' + buying.error.purchaseDetails['Nama Lengkap'] + '" dengan menggunakan metode pembayaran "' + buying.error.purchaseDetails['Cara Pembayaran'] + '"?'));
+      messages.push({
+        "type": "template",
+        "altText": "Konfirmasi pembelian tiket",
+        "template": {
+          "type": "buttons",
+          "text": "Apakah anda yakin?",
+          "actions": [
+            {
+              "type": "message",
+              "label": "Yakin!",
+              "text": "/beli " + message[1] + " " + message[2] + " confirm " + data.userId
+            }
+          ]
+        }
+      });
+      return send(messages, data);
+    } else {
+      if (buying.success) {
+        return send(await textMessage('Pembelian tiket anda berhasil!'), data);
+      } else {
+        return send(await textMessage('Galat. Silakan coba lagi nanti.'), data);
+      }
+    }
+  } else {
+    if (data.groupId !== undefined || data.roomId !== undefined) {
+      reply = {
+        "type": "template",
+        "altText": "Silakan login terlebih dahulu",
+        "template": {
+          "type": "buttons",
+          "text": "Silakan login terlebih dahulu dengan mengetikan /login melalui japri di akun JKTbot",
+          "actions": [
+            {
+              "type": "uri",
+              "label": "Japri JKTbot",
+              "uri": "line://oaMessage/@jktbot/?%2Flogin"
+            },
+          ]
+        }
+      };
+    } else {
+      reply = {
+        "type": "template",
+        "altText": "Silakan login terlebih dahulu",
+        "template": {
+          "type": "buttons",
+          "text": "Silakan login terlebih dahulu di akun JKT48 anda",
+          "actions": [
+            {
+              "type": "uri",
+              "label": "Login",
+              "uri": "https://ngidol.club?userId=" + data.userId
+            },
+          ]
+        }
+      };
+    }  
+    return send(reply, data);
+  }
 };
 
 const textMessage = async (message) => {
@@ -119,12 +295,6 @@ const jadwal = async (message, data) => {
     message = message.join(" ");
 
     try {
-      // setlist check
-
-      // let setlist = await setlistModel.findOne({
-      //   "slug": message
-      // });
-    
       try {
         let setlist = await setlistModel.findOne({
           "slug": message
@@ -152,6 +322,11 @@ const jadwal = async (message, data) => {
                   "type": "message",
                   "label": "Daftar Member",
                   "text": "/daftar-performer " + show.unixTime
+                },
+                {
+                  "type": "message",
+                  "label": "Beli Tiket",
+                  "text": "/beli " + show.unixTime
                 },
               ]
             }
@@ -243,7 +418,7 @@ const daftarMember = async (message, data) => {
               ]
             },
             {
-              "thumbnailImageUrl": "https://storage.googleapis.com/asia.artifacts.f4-dev-circle.appspot.com/bot-images/academy.png",
+              "thumbnailImageUrl": "https://storage.googleapis.com/aurora-bot/bot-images/bot-images_academy.png",
               "text": "JKT48 Academy",
               "actions": [
                 {
