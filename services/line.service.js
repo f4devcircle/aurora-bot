@@ -156,7 +156,7 @@ const beli = async (message, data) => {
       console.log(reply.template.actions);
       return send(reply, data);
     } else if (buying.error.type === 'NOT_ENOUGH_BALANCE') {
-      return send(await textMessage('Saldo anda tidak cukup untuk membeli tiket ini'), data);
+      return send(await textMessage(buying.error.message), data);
     } else if (buying.error.type === 'NEED_CONFIRMATION') {
       let messages = [];
       messages.push(await textMessage('Apakah anda yakin akan membeli tiket "' + buying.error.purchaseDetails['Nama Acara'] + '" (' + buying.error.purchaseDetails['Show'] + ') seharga "' + buying.error.purchaseDetails['Total Pembayaran'] + '" (' + buying.error.purchaseDetails['Tipe Tiket'] + " - " + buying.error.purchaseDetails['Jenis Tiket'] + ') atas nama "' + buying.error.purchaseDetails['Nama Lengkap'] + '" dengan menggunakan metode pembayaran "' + buying.error.purchaseDetails['Cara Pembayaran'] + '"?'));
