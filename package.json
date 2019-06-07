@@ -6,7 +6,7 @@
   "dependencies": {
     "@google-cloud/datastore": "^2.0.0",
     "@line/bot-sdk": "^6.3.0",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "crypto": "^1.0.1",
