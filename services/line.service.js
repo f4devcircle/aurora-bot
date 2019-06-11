@@ -14,38 +14,27 @@ const line = new lineSDK.Client({
 
 const index = async (message, data) => {
   let reply = await textMessage('Perintah tidak ditemukan, silakan lihat daftar perintah dengan mengetikkan /help');
-  
-  if (message[0] === '/help') {
-    reply = await textMessage(await help());
-    return send(reply, data);
-  } else if (message[0] === '/jadwal') {
-    reply = await jadwal(message, data);
-    return send(reply, data);
-  } else if (message[0] === '/langganan') {
-    // reply = await textMessage('Fitur berlangganan jadwal teater akan segera hadir. Ditunggu, ya!')
-    reply = await (langganan(message, data));
-    return send(reply, data);
-  } else if (message[0] === '/daftar-performer' && message.length === 2) {
-    reply = await daftarPerformer(message, data);
-    return send(reply, data);
-  } else if (message[0] === '/beli') {
-    // reply = await textMessage('Fitur pembelian tiket akan segera hadir. Ditunggu, ya!');
-    return await beli(message, data);
-  } else if (message[0] === '/daftar-member') {
-    reply = await (daftarMember(message, data));
-    return true;
-  } else if (message[0] === '/batal-langganan') {
-    reply = await unsubscribe(message, data);
-    return true;
-  } else if (message[0] === '/login') {
-    reply = await login(message, data);
-    return true;
-  } else {
-    send(reply, data);
+
+  const responses = {
+    '/help': textMessage(await help()),
+    '/jadwal': jadwal(message, data),
+    '/langganan': langganan(message, data),
+    '/daftar-performer': daftarPerformer(message, data),
+    '/beli': beli(message, data),
+    '/daftar-member': daftarMember(message, data),
+    '/batal-langganan': unsubscribe(message, data),
+    '/login': login(message, data)
   }
 
   storeMessage(message, data);
-  return true;
+
+  if (responses[message[0]]) {
+    reply = await responses[message[0]];
+    send(reply, data);
+  } else {
+    send(reply, data);
+  }
+  return true
 };
 
 const login = async (message, data) => {
