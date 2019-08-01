@@ -719,7 +719,7 @@ const push = async (req) => {
             "columns": [
               {
                 "thumbnailImageUrl": (member.imgURL.split('?')[0]).replace(/_s.jpg/g, ".jpg"),
-                "title": setlist.plain().name,
+                "title": member.plain().name,
                 "text": ((req.body.action === 'add')? 'DITAMBAHKAN | ' : "DIHAPUS | ") + moment.unix(req.body.showData.unixTime).format("dddd, DD MMMM YYYY") + ', ' + req.body.showData.showTime + '\n' + setlist.plain().description,
                 "actions": [
                   {
