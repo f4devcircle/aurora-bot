@@ -15,6 +15,6 @@
     "express-ipfilter": "^0.3.1",
     "gstore-node": "^4.3.0",
     "lodash": "^4.17.13",
-    "moment": "^2.22.2"
+    "moment": "^2.29.2"
   }
 }
